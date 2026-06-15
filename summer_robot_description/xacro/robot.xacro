@@ -1,0 +1,153 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="my_omni_robot">
+    <material name="gray">
+      <color rgba="0.8 0.8 0.8 1.0"/>
+    </material>
+    <material name="black">
+      <color rgba="0 0 0 1.0"/>
+    </material>
+    <material name="white">
+      <color rgba="1.0 1.0 1.0 1.0"/>
+    </material>
+    <material name="red">
+      <color rgba="1.0 0 0 1.0"/>
+    </material>
+    <material name="light_red">
+      <color rgba="1.0 0.5 0.5 1.0"/>
+    </material>
+    <material name="yellow">
+      <color rgba="0 1.0 1.0 1.0"/>
+    </material>
+    <xacro:include filename="$(find summer_robot_description)/xacro/omni_wheel.xacro" />
+    <link name="base_footprint"/>
+  <joint name="footprint_base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child  link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+   <link name="base_link"/>
+   <!-- ========== LiDAR Joint ========== -->
+<joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
+    <origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+</joint>
+
+<!-- ========== LiDAR Link ========== -->
+<link name="laser">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <cylinder length="0.04" radius="0.05"/>
+        </geometry>
+        <material name="laser_material">
+            <color rgba="0.13 0.13 0.13 1.0"/>
+        </material>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <cylinder length="0.04" radius="0.05"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.1"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0"
+                 iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+</link>
+
+<!-- ========== Gazebo Sensor ========== -->
+<gazebo reference="laser">
+    <sensor name="laser" type="gpu_lidar">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>30</update_rate>
+        <topic>/scan</topic>
+        <gz_frame_id>laser</gz_frame_id>
+        <lidar>
+            <scan>
+                <horizontal>
+                    <samples>720</samples>
+                    <resolution>1</resolution>
+                    <min_angle>-3.14159</min_angle>
+                    <max_angle>3.14159</max_angle>
+                </horizontal>
+            </scan>
+            <range>
+                <min>0.05</min>
+                <max>10.0</max>
+                <resolution>0.01</resolution>
+            </range>
+            <noise>
+                <type>gaussian</type>
+                <mean>0.0</mean>
+                <stddev>0.01</stddev>
+            </noise>
+        </lidar>
+    </sensor>
+</gazebo>
+
+  <joint name="body_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="body_link"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  </joint>
+  <link name="body_link">
+    <visual>
+      <geometry>
+        <box size="0.12 0.12 0.02" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.12 0.12 0.02" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>  
+  </link>
+
+  <joint name="wheel0_attach_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="wheel0_attach_link"/>
+    <origin xyz="${0.07*cos(pi/4)} ${0.07*sin(pi/4)} 0.019" rpy="0 0 ${pi/4}"/>
+  </joint>
+  <link name="wheel0_attach_link" />
+  <xacro:omni_wheel_set prefix="wheel0" parent="wheel0_attach_link" />
+
+  <joint name="wheel1_attach_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="wheel1_attach_link"/>
+    <origin xyz="${0.07*cos(3*pi/4)} ${0.07*sin(3*pi/4)} 0.019" rpy="0 0 ${3*pi/4}"/>
+  </joint>
+  <link name="wheel1_attach_link" />
+  <xacro:omni_wheel_set prefix="wheel1" parent="wheel1_attach_link" />
+
+  <joint name="wheel2_attach_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="wheel2_attach_link"/>
+    <origin xyz="${0.07*cos(5*pi/4)} ${0.07*sin(5*pi/4)} 0.019" rpy="0 0 ${5*pi/4}"/>
+  </joint>
+  <link name="wheel2_attach_link" />
+  <xacro:omni_wheel_set prefix="wheel2" parent="wheel2_attach_link" />
+
+  <joint name="wheel3_attach_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="wheel3_attach_link"/>
+    <origin xyz="${0.07*cos(7*pi/4)} ${0.07*sin(7*pi/4)} 0.019" rpy="0 0 ${7*pi/4}"/>
+  </joint>
+  <link name="wheel3_attach_link" />
+  <xacro:omni_wheel_set prefix="wheel3" parent="wheel3_attach_link" />
+
+  <gazebo>
+    <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <robotNamespace>/odm_robot</robotNamespace>
+      <parameters>$(find summer_robot_ros2_control)/config/ros2_control.yaml</parameters>
+    </plugin>
+  </gazebo>
+</robot>

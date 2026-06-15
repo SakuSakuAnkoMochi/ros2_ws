@@ -1,0 +1,198 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro">  
+
+  <!--コロの定義-->
+  <xacro:macro name="barrel" params="prefix parent dir">
+    <joint name="${prefix}_joint" type="continuous"><!-- continuous -->
+      <parent link="${parent}"/>
+      <child link="${prefix}_link"/>
+      <origin rpy="${pi/2} 0 ${dir}" xyz="${0.014*cos(dir)} ${0.014*sin(dir)} 0.006"/>
+      <axis xyz="0 0 1"/>
+      <dynamics damping="0.001"/>
+    </joint>
+    <!--<ros2_control name="${prefix}_trans" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+
+      <joint name="${prefix}_joint">
+        <command_interface name="effort" />
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </ros2_control>-->
+    <link name="${prefix}_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://summer_robot_description/meshes/omni_barrel.stl" />
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <!--<collision>
+        <geometry>
+          <mesh filename="package://summer_robot_description/meshes/omni_barrel.stl" />
+        </geometry>
+      </collision>-->
+       <collision>
+        <!-- STLをやめてcylinderに変更 -->
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+            <cylinder radius="0.007" length="0.012"/>
+        </geometry>
+    </collision>
+      <inertial>
+        <mass value="0.002"/>
+        <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+      </inertial>  
+    </link>
+    <gazebo reference="${prefix}_link">
+      <mu1 value="2.5" />
+      <mu2 value="2.5" />
+      <kp value="5000" />
+      <kd value="10" />
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <!--コロに謎の白い箱を追加している-->
+    <joint name="${prefix}_mark_joint" type="fixed">
+      <parent link="${prefix}_link"/>
+      <child link="${prefix}_mark_link"/>
+      <origin rpy="0 0 0" xyz="0.005 0 0"/>
+    </joint>
+    <link name="${prefix}_mark_link">
+      <visual>
+        <geometry>
+          <box size="0.005 0.005 0.005"/>
+        </geometry>
+        <material name="white"/>
+      </visual>
+    </link>
+    <gazebo reference="${prefix}_mark_link">
+      <material>Gazebo/White</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!--モータ(可動部)の定義-->
+  <!--
+  [${parent}]->(${prefix}_joint)->[${prefix}_body_link {モータのstl}]->(${prefix}_shaft_joint {モータ（可動部）} )->[${prefix}_shaft_link {軸のstl}]
+  -->
+  <xacro:macro name="motor" params="prefix parent">
+    <joint name="${prefix}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child  link="${prefix}_body_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+    <!--モータ-->
+    <link name="${prefix}_body_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://summer_robot_description/meshes/ga25_body.stl" />
+        </geometry>
+        <material name="gray"/>
+      </visual>
+      <collision>
+        <origin rpy="0 ${radians(90)} 0" xyz="-0.025 0 0"/>
+        <geometry>
+          <cylinder radius="0.012" length="0.05" />
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.150"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+      </inertial>  
+    </link>
+    <gazebo reference="${prefix}_body_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+
+    <joint name="${prefix}_shaft_joint" type="continuous">
+      <parent link="${prefix}_body_link"/>
+      <child  link="${prefix}_shaft_link"/>
+      <origin rpy="0 0 0" xyz="0.012 0 0"/>
+      <axis xyz="1 0 0"/>
+      <limit velocity="40.0" effort="3.0" />
+      <dynamics damping="0.01" friction="0.0"/>
+    </joint>
+    <ros2_control name="${prefix}_shaft_trans" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+
+      <joint name="${prefix}_shaft_joint">
+        <command_interface name="velocity"/>
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </ros2_control>
+    <!--軸-->
+    <link name="${prefix}_shaft_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://summer_robot_description/meshes/ga25_shaft.stl" />
+        </geometry>
+        <material name="gray"/>
+      </visual>
+      <inertial>
+        <mass value="0.010"/>
+        <inertia ixx="0.0000005" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+      </inertial>  
+    </link>
+    <gazebo reference="${prefix}_shaft_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!--全体の組み合わせ-->
+  <xacro:macro name="omni_wheel_set" params="prefix parent">
+    <joint name="${prefix}_base_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="${prefix}_base_link"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </joint>
+    <link name="${prefix}_base_link" />
+    
+    <xacro:motor prefix="${prefix}_motor" parent="${prefix}_base_link" />
+
+    <joint name="${prefix}_housind_joint" type="fixed">
+      <parent link="${prefix}_motor_shaft_link"/>
+      <child  link="${prefix}_housing_link"/>
+      <origin xyz="0.012 0 0" rpy="0 ${radians(90)} 0"/>
+    </joint>
+    <link name="${prefix}_housing_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://summer_robot_description/meshes/omni_housing.stl" />
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <material name="gray"/>
+      </visual>
+      <inertial>
+        <mass value="0.025"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+      </inertial>  
+    </link>
+    <gazebo reference="${prefix}_housing_link">
+      <material>Gazebo/Gray</material>
+    </gazebo>
+
+    <joint name="${prefix}_housing_s_joint" type="fixed">
+      <parent link="${prefix}_housing_link"/>
+      <child link="${prefix}_housing_s_link"/>
+      <origin rpy="0 ${pi} ${pi/4}" xyz="0 0 0"/>
+    </joint>
+    <link name="${prefix}_housing_s_link">
+      <inertial>
+        <mass value="0.025"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+      </inertial>  
+    </link>
+
+    <xacro:barrel prefix="${prefix}_barrel_1" parent="${prefix}_housing_link" dir="0"/>
+    <xacro:barrel prefix="${prefix}_barrel_2" parent="${prefix}_housing_link" dir="${pi/2}"/>
+    <xacro:barrel prefix="${prefix}_barrel_3" parent="${prefix}_housing_link" dir="${pi}"/>
+    <xacro:barrel prefix="${prefix}_barrel_4" parent="${prefix}_housing_link" dir="${-pi/2}"/>
+    <xacro:barrel prefix="${prefix}_barrel_5" parent="${prefix}_housing_s_link" dir="0"/>
+    <xacro:barrel prefix="${prefix}_barrel_6" parent="${prefix}_housing_s_link" dir="${pi/2}"/>
+    <xacro:barrel prefix="${prefix}_barrel_7" parent="${prefix}_housing_s_link" dir="${pi}"/>
+    <xacro:barrel prefix="${prefix}_barrel_8" parent="${prefix}_housing_s_link" dir="${-pi/2}"/>
+  </xacro:macro>
+</robot>
