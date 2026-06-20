@@ -6,10 +6,7 @@
     <node pkg="robot_state_publisher" exec="robot_state_publisher" name="robot_state_publisher" output="screen">
         <param name="use_sim_time" value="$(var use_sim_time)" />
         <param name="robot_description" value="$(var robot_description)" />
-    </node>
-    
-    <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen">
-        <param name="use_sim_time" value="$(var use_sim_time)" />
+        <param name="publish_frequency" value="50.0" />
     </node>
 
     <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
@@ -19,12 +16,12 @@
     <node pkg="ros_gz_sim" exec="create" output="screen">
         <param name="string" value="$(var robot_description)" />
         <param name="allow_renaming" value="true"/>
-        <param name="use_sim_time" value="true"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
         <param name="z" value="1.0"/>
     </node>
     <node pkg="ros_gz_bridge" exec="parameter_bridge" output="screen">
         <param name="config_file" value="$(find-pkg-share summer_robot_gazebo)/config/gz_params.yaml"/>
-        <param name="use_sim_time" value="true"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
     </node>
     <!--<node pkg="controller_manager" exec="ros2_control_node" output="screen">
         <param from="ros2_control.yaml"/>
@@ -32,11 +29,16 @@
         <param name="use_sim_time" value="true"/>
     </node>-->
     <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster" output="screen">
-        <param name="use_sim_time" value="true"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
     </node>
 
     <node pkg="controller_manager" exec="spawner" args="omni_wheel_drive_controller" output="screen">
-        <param name="use_sim_time" value="true"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <node pkg="robot_localization" exec="ekf_node" name="ekf_filter_node">
+        <param from="$(find-pkg-share summer_robot_ekf)/config/ekf.yaml"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
     </node>
 <!--export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH:$CONDA_PREFIX/lib-->
 <!--ros2 run teleop_twist_keyboard teleop_twist_keyboard /cmd_vel:=/omni_wheel_drive_controller/cmd_vel - -ros-args -p use_sim_time:=true -p stamped:=true-->
