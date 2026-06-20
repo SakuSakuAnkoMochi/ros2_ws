@@ -29,7 +29,7 @@
 <joint name="laser_joint" type="fixed">
     <parent link="base_link"/>
     <child link="laser"/>
-    <origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+    <origin xyz="0.0 0.0 0.15" rpy="0 0 0"/>
 </joint>
 
 <!-- ========== LiDAR Link ========== -->
@@ -87,6 +87,12 @@
             </noise>
         </lidar>
     </sensor>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <visualize>true</visualize>
+    <topic>imu</topic>
+</sensor>
 </gazebo>
 
   <joint name="body_joint" type="fixed">
@@ -115,7 +121,7 @@
   <joint name="wheel0_attach_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="wheel0_attach_link"/>
-    <origin xyz="${0.07*cos(pi/4)} ${0.07*sin(pi/4)} 0.019" rpy="0 0 ${pi/4}"/>
+    <origin xyz="${0.07*cos(0)} ${0.07*sin(0)} 0.019" rpy="0 0 ${0}"/>
   </joint>
   <link name="wheel0_attach_link" />
   <xacro:omni_wheel_set prefix="wheel0" parent="wheel0_attach_link" />
@@ -123,7 +129,7 @@
   <joint name="wheel1_attach_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="wheel1_attach_link"/>
-    <origin xyz="${0.07*cos(3*pi/4)} ${0.07*sin(3*pi/4)} 0.019" rpy="0 0 ${3*pi/4}"/>
+    <origin xyz="${0.07*cos(pi/2)} ${0.07*sin(pi/2)} 0.019" rpy="0 0 ${pi/2}"/>
   </joint>
   <link name="wheel1_attach_link" />
   <xacro:omni_wheel_set prefix="wheel1" parent="wheel1_attach_link" />
@@ -131,7 +137,7 @@
   <joint name="wheel2_attach_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="wheel2_attach_link"/>
-    <origin xyz="${0.07*cos(5*pi/4)} ${0.07*sin(5*pi/4)} 0.019" rpy="0 0 ${5*pi/4}"/>
+    <origin xyz="${0.07*cos(pi)} ${0.07*sin(pi)} 0.019" rpy="0 0 ${pi}"/>
   </joint>
   <link name="wheel2_attach_link" />
   <xacro:omni_wheel_set prefix="wheel2" parent="wheel2_attach_link" />
@@ -139,7 +145,7 @@
   <joint name="wheel3_attach_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="wheel3_attach_link"/>
-    <origin xyz="${0.07*cos(7*pi/4)} ${0.07*sin(7*pi/4)} 0.019" rpy="0 0 ${7*pi/4}"/>
+    <origin xyz="${0.07*cos(3*pi/2)} ${0.07*sin(3*pi/2)} 0.019" rpy="0 0 ${3*pi/2}"/>
   </joint>
   <link name="wheel3_attach_link" />
   <xacro:omni_wheel_set prefix="wheel3" parent="wheel3_attach_link" />
