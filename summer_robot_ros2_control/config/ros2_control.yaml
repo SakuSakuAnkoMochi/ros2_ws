@@ -17,10 +17,10 @@ omni_wheel_drive_controller:
       - wheel1_motor_shaft_joint
       - wheel2_motor_shaft_joint
       - wheel3_motor_shaft_joint
-    robot_radius: 0.20      # ロボット中心からホイールまでの距離
-    wheel_radius: 0.05      # ホイールの半径
+    robot_radius: 0.0855      # ロボット中心からホイールまでの距離
+    wheel_radius: 0.02      # ホイールの半径
     wheel_offset: 0.0       # 最初のホイールのX軸からの角度オフセット(rad)
     odom_frame_id: odom
     base_frame_id: base_footprint
-    enable_odom_tf: true
-    cmd_vel_timeout: 0.5
+    enable_odom_tf: false
+    cmd_vel_timeout: 0.5   # slam_toolbox_params.yaml の中を修正
