@@ -3,14 +3,13 @@
 #include <tf2/LinearMath/Transform.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
-static
-geometry_msgs::msg::Pose transformToPose(const tf2::Transform& tf)
+static geometry_msgs::msg::Pose transformToPose(const tf2::Transform &tf)
 {
     geometry_msgs::msg::Pose pose;
     pose.position.x = tf.getOrigin().x();
-    pose.position.y =tf.getOrigin().y();
-    pose.position.z =tf.getOrigin().z();
-    pose.orientation =tf2::toMsg(tf.getRotation());
+    pose.position.y = tf.getOrigin().y();
+    pose.position.z = tf.getOrigin().z();
+    pose.orientation = tf2::toMsg(tf.getRotation());
 
     return pose;
 }
@@ -19,10 +18,10 @@ using InteractiveMarker = visualization_msgs::msg::InteractiveMarker;
 using InteractiveMarkerControl = visualization_msgs::msg::InteractiveMarkerControl;
 using Marker = visualization_msgs::msg::Marker;
 
-MarkerManager::MarkerManager(rclcpp::Node* node, tf2_ros::Buffer *tf_buffer) : node_(node), tf_buffer_(tf_buffer)
+MarkerManager::MarkerManager(rclcpp::Node *node, tf2_ros::Buffer *tf_buffer) : node_(node), tf_buffer_(tf_buffer)
 {
-    //server_ =std::make_shared<interactive_markers::InteractiveMarkerServer>("waypoint_server",node_->shared_from_this());
-    server_ =std::make_shared<interactive_markers::InteractiveMarkerServer>("waypoint_server",node_);
+    // server_ =std::make_shared<interactive_markers::InteractiveMarkerServer>("waypoint_server",node_->shared_from_this());
+    server_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("waypoint_server", node_);
 
     delete_handle_ = menu_.insert("Delete", std::bind(&MarkerManager::deleteCallback, this, std::placeholders::_1));
 
@@ -77,9 +76,9 @@ std::vector<Waypoint> MarkerManager::getWaypoints() const
 void MarkerManager::createInteractiveMarker(const Waypoint &wp)
 {
     RCLCPP_INFO(
-    node_->get_logger(),
-    "create marker %s",
-    wp.name.c_str());
+        node_->get_logger(),
+        "create marker %s",
+        wp.name.c_str());
     InteractiveMarker marker;
 
     marker.header.frame_id = "map";
@@ -92,24 +91,35 @@ void MarkerManager::createInteractiveMarker(const Waypoint &wp)
 
     marker.pose = localToWorld(wp);
 
-    Marker sphere;
+    // Marker sphere;
 
-    sphere.type = Marker::SPHERE;
+    // sphere.type = Marker::SPHERE;
 
-    sphere.scale.x = 0.08;
-    sphere.scale.y = 0.08;
-    sphere.scale.z = 0.08;
+    // sphere.scale.x = 0.08;
+    // sphere.scale.y = 0.08;
+    // sphere.scale.z = 0.08;
 
-    sphere.color.r = 0.0;
-    sphere.color.g = 1.0;
-    sphere.color.b = 0.0;
-    sphere.color.a = 1.0;
+    // sphere.color.r = 0.0;
+    // sphere.color.g = 1.0;
+    // sphere.color.b = 0.0;
+    // sphere.color.a = 1.0;
+
+    Marker arrow;
+    arrow.type = Marker::ARROW;
+    arrow.scale.x = 0.25;
+    arrow.scale.y = 0.04;
+    arrow.scale.z = 0.04;
+    arrow.color.r = 1.0;
+    arrow.color.g = 0.6;
+    arrow.color.b = 0.0;
+    arrow.color.a = 1.0;
 
     InteractiveMarkerControl visual;
 
     visual.always_visible = true;
 
-    visual.markers.push_back(sphere);
+    // visual.markers.push_back(sphere);
+    visual.markers.push_back(arrow);
 
     marker.controls.push_back(visual);
 
@@ -124,6 +134,7 @@ void MarkerManager::createInteractiveMarker(const Waypoint &wp)
 void MarkerManager::add6DofControls(InteractiveMarker &marker)
 {
     InteractiveMarkerControl control;
+    control.orientation_mode = InteractiveMarkerControl::FIXED;
 
     control.orientation.w = 1.0;
     control.orientation.x = 1.0;
@@ -134,9 +145,9 @@ void MarkerManager::add6DofControls(InteractiveMarker &marker)
 
     marker.controls.push_back(control);
 
-    control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+    // control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
 
-    marker.controls.push_back(control);
+    // marker.controls.push_back(control);
 
     control.orientation.x = 0.0;
     control.orientation.y = 1.0;
@@ -158,9 +169,9 @@ void MarkerManager::add6DofControls(InteractiveMarker &marker)
 
     marker.controls.push_back(control);
 
-    control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
+    // control.interaction_mode = InteractiveMarkerControl::ROTATE_AXIS;
 
-    marker.controls.push_back(control);
+    // marker.controls.push_back(control);
 }
 
 geometry_msgs::msg::Pose MarkerManager::localToWorld(const Waypoint &wp)
@@ -183,7 +194,7 @@ geometry_msgs::msg::Pose MarkerManager::localToWorld(const Waypoint &wp)
 
         tf2::Transform map_T_local = map_T_frame * frame_T_local;
 
-        result =transformToPose(map_T_local);
+        result = transformToPose(map_T_local);
     }
     catch (...)
     {
@@ -215,7 +226,7 @@ geometry_msgs::msg::Pose MarkerManager::worldToLocal(const std::string &frame_id
 
         tf2::Transform frame_T_pose = frame_T_map * map_T_pose;
 
-        result =transformToPose(frame_T_pose);
+        result = transformToPose(frame_T_pose);
     }
     catch (...)
     {
