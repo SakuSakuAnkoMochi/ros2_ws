@@ -7,12 +7,14 @@
         <mesh filename="package://summer_robot_field_description/meshes/summer_robot_field.glb"/>
       </geometry>
     </visual>
+    
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 -0.0005" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://summer_robot_field_description/meshes/summer_robot_field.glb"/>
+        <box size="3.5 7.0 0.001"/>
       </geometry>
     </collision>
+    
     <inertial>
       <mass value="1000.0"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -20,7 +22,7 @@
     </inertial>
   </link>
 
-  <gazebo reference="field_link">
+  <gazebo>
     <static>true</static>
   </gazebo>
 </robot>

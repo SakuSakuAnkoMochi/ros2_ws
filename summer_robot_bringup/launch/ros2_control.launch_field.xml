@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<launch>
+    <arg name="use_gui" default="true" />
+    <arg name="use_sim_time" default="true" />
+
+    <!--ロボットの定義-->
+    <arg name="robot_description" default="$(command 'xacro $(find-pkg-share summer_robot_description)/xacro/robot.xacro')" />
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" name="robot_state_publisher" output="screen">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+        <param name="robot_description" value="$(var robot_description)" />
+        <param name="publish_frequency" value="50.0" />
+    </node>
+
+    <!--フィールドの定義-->
+    <arg name="pkg_share" default="$(find-pkg-share summer_robot_field_description)"/>
+    <arg name="field_urdf_path" default="$(var pkg_share)/urdf/field.urdf"/>
+
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" name="field_state_publisher" output="screen">
+        <param name="robot_description" value="$(command 'cat $(var field_urdf_path)')"/>
+        <remap from="/robot_description" to="/field_description"/>
+    </node>
+
+    <node pkg="tf2_ros" exec="static_transform_publisher" name="world_to_field_publisher"
+            args="0 0 0 0 0 0 map field_link" />
+    <!--gazebo立ち上げ-->
+    <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+        <arg name="gz_args" value="-r -v 4 $(find-pkg-share summer_robot_gazebo)/world/world_field.sdf"/>
+    </include>
+    <!--フィールドの召喚-->
+        <node pkg="ros_gz_sim" exec="create" name="spawn_field_entity" output="screen">
+        <param name="name" value="my_field_model" />
+        <param name="file" value="$(var field_urdf_path)" />
+        <param name="allow_renaming" value="true" />
+        <param name="x" value="0.0"/>
+        <param name="y" value="0.0"/>
+        <param name="z" value="0.0"/>
+    </node>
+    <!--https://github.com/gazebosim/ros_gz/blob/ros2/ros_gz_sim/src/create.cpp-->
+    <!--ロボットの召喚-->
+    <node pkg="ros_gz_sim" exec="create" output="screen">
+        <param name="string" value="$(var robot_description)" />
+        <param name="allow_renaming" value="true"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+        <param name="z" value="1.0"/>
+    </node>
+    <node pkg="ros_gz_bridge" exec="parameter_bridge" output="screen">
+        <param name="config_file" value="$(find-pkg-share summer_robot_gazebo)/config/gz_params.yaml"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+    <!--<node pkg="controller_manager" exec="ros2_control_node" output="screen">
+        <param from="ros2_control.yaml"/>
+        <param name="robot_description" value="$(var robot_description)"/>
+        <param name="use_sim_time" value="true"/>
+    </node>-->
+    <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster" output="screen">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <node pkg="controller_manager" exec="spawner" args="omni_wheel_drive_controller" output="screen">
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+
+    <node pkg="robot_localization" exec="ekf_node" name="ekf_filter_node">
+        <param from="$(find-pkg-share summer_robot_ekf)/config/ekf.yaml"/>
+        <param name="use_sim_time" value="$(var use_sim_time)" />
+    </node>
+<!--export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH:$CONDA_PREFIX/lib-->
+<!--ros2 run teleop_twist_keyboard teleop_twist_keyboard /cmd_vel:=/omni_wheel_drive_controller/cmd_vel - -ros-args -p use_sim_time:=true -p stamped:=true-->
+
+</launch>
