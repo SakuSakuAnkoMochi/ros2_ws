@@ -1,0 +1,44 @@
+<svg width="3500" height="7000" viewBox="0, 0, 3500, 7000" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="3500" height="7000" fill="#467D46" />
+        <line x1="0" y1="3519" x2="3500" y2="3519" fill="#CCCBC1" stroke="#CCCBC1" stroke-width="38" />
+	<line x1="0" y1="19" x2="3500" y2="19" fill="#A88F6C" stroke="#A88F6C" stroke-width="38" />
+    <line x1="0" y1="6981" x2="3500" y2="6981" fill="#A88F6C" stroke="#A88F6C" stroke-width="38" />
+    <line x1="19" y1="0" x2="19" y2="7000" fill="#A88F6C" stroke="#A88F6C" stroke-width="38" />
+    <line x1="3481" y1="0" x2="3481" y2="7000" fill="#A88F6C" stroke="#A88F6C" stroke-width="38" />
+    <g transform="translate(1400, 38) rotate(0)">
+        <rect x="0" y="0" width="700" height="700" fill="#92352D" />
+        <rect x="38" y="38" width="624" height="624" fill="#467D46" />
+    </g>
+    <g transform="translate(38, 38) rotate(0)">
+        <rect x="0" y="0" width="300" height="300" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="224" fill="#467D46" />
+    </g>
+    <g transform="translate(38, 6662) rotate(0)">
+        <rect x="0" y="0" width="300" height="300" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="224" fill="#467D46" />
+    </g>
+    <g transform="translate(3162, 38) rotate(0)">
+        <rect x="0" y="0" width="300" height="300" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="224" fill="#467D46" />
+    </g>
+    <g transform="translate(3162, 6662) rotate(0)">
+        <rect x="0" y="0" width="300" height="300" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="224" fill="#467D46" />
+    </g>
+    <g transform="translate(1325, 1516) rotate(0)">
+        <rect x="0" y="0" width="850" height="450" fill="#CCCBC1" />
+        <rect x="38" y="38" width="774" height="374" fill="#467D46" />
+    </g>
+    <g transform="translate(1325, 6512) rotate(0)">
+        <rect x="0" y="0" width="850" height="450" fill="#CCCBC1" />
+        <rect x="38" y="38" width="774" height="374" fill="#467D46" />
+    </g>
+    <g transform="translate(38, 3038) rotate(0)">
+        <rect x="0" y="0" width="300" height="500" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="424" fill="#467D46" />
+    </g>    
+    <g transform="translate(3162, 3038) rotate(0)">
+        <rect x="0" y="0" width="300" height="500" fill="#CCCBC1" />
+        <rect x="38" y="38" width="224" height="424" fill="#467D46" />
+    </g>
+</svg>
