@@ -79,6 +79,8 @@ void MarkerManager::createInteractiveMarker(const Waypoint &wp)
         node_->get_logger(),
         "create marker %s",
         wp.name.c_str());
+
+
     InteractiveMarker marker;
 
     marker.header.frame_id = "map";
@@ -236,21 +238,47 @@ geometry_msgs::msg::Pose MarkerManager::worldToLocal(const std::string &frame_id
     return result;
 }
 
-void MarkerManager::feedbackCallback(FeedbackConstPtr feedback)
+void MarkerManager::feedbackCallback(
+    FeedbackConstPtr feedback)
 {
-    if (feedback->event_type != Feedback::POSE_UPDATE)
+        RCLCPP_INFO(
+        node_->get_logger(),
+        "event=%d",
+        feedback->event_type);
+    switch (feedback->event_type)
     {
-        return;
+    case Feedback::POSE_UPDATE:
+    {
+        auto it =
+            waypoints_.find(
+                feedback->marker_name);
+
+        if (it == waypoints_.end())
+        {
+            return;
+        }
+
+        it->second.local_pose =
+            worldToLocal(
+                it->second.frame_id,
+                feedback->pose);
+
+        break;
     }
 
-    auto it = waypoints_.find(feedback->marker_name);
-
-    if (it == waypoints_.end())
+    case Feedback::MENU_SELECT:
     {
-        return;
+        RCLCPP_INFO(
+            node_->get_logger(),
+            "menu selected: %s",
+            feedback->marker_name.c_str());
+
+        break;
     }
 
-    it->second.local_pose = worldToLocal(it->second.frame_id, feedback->pose);
+    default:
+        break;
+    }
 }
 
 void MarkerManager::deleteCallback(FeedbackConstPtr feedback)
